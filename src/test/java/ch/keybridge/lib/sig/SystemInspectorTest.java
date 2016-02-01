@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Key Bridge LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
 package ch.keybridge.lib.sig;
 
 import ch.keybridge.lib.sig.hw.*;
+import ch.keybridge.lib.sig.hw.net.NetworkInterfaceInfo;
 import ch.keybridge.lib.sig.sw.OperatingSystemInfo;
 import ch.keybridge.lib.sig.sw.config.NTPConfiguration;
 import ch.keybridge.lib.sig.sw.config.SystemUserInfo;
@@ -23,11 +24,12 @@ import ch.keybridge.lib.sig.sw.run.ProcessInfo;
 import ch.keybridge.lib.sig.sw.run.SocketInfo;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 import org.junit.Test;
 
 /**
  *
- * @author Key Bridge LLC 
+ * @author Key Bridge LLC
  * @since 1.0.0 (01/31/16)
  */
 public class SystemInspectorTest {
@@ -43,6 +45,11 @@ public class SystemInspectorTest {
 
     CPUInfo cpu = sig.getCPUInfo();
     System.out.println("cpu     : " + cpu);
+    System.out.println("  cpu usage  : " + cpu.getSystemUsage() + "%");
+    for (Map.Entry<String, Double> entry : cpu.getSystemUsageDetail().entrySet()) {
+      System.out.println("  " + entry.getKey() + " " + entry.getValue() + "%");
+
+    }
 
     MemoryInfo memory = sig.getMemoryInfo();
     System.out.println("memory  : " + memory);
@@ -51,6 +58,11 @@ public class SystemInspectorTest {
     System.out.println("file systems");
     for (FileSystemInfo fileSystemInfo : fsInfo) {
       System.out.println("   fs  : " + fileSystemInfo);
+    }
+
+    System.out.println("networks");
+    for (NetworkInterfaceInfo network : NetworkInterfaceInfo.getAllInterfaces()) {
+      System.out.println("  net    : " + network);
     }
 
     Collection<DisplayInfo> displays = sig.getDisplayInfo();
@@ -88,7 +100,6 @@ public class SystemInspectorTest {
 
     NTPConfiguration ntp = os.getNTPConfiguration();
     System.out.println("ntp   : " + ntp);
-
   }
 
 }
