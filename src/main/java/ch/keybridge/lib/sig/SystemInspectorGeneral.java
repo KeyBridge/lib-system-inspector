@@ -17,6 +17,7 @@ package ch.keybridge.lib.sig;
 
 import ch.keybridge.lib.sig.enumerated.ESystemType;
 import ch.keybridge.lib.sig.hw.*;
+import ch.keybridge.lib.sig.hw.net.NetworkInterfaceInfo;
 import ch.keybridge.lib.sig.sw.OperatingSystemInfo;
 import com.sun.jna.Platform;
 import java.io.IOException;
@@ -60,6 +61,19 @@ public class SystemInspectorGeneral {
   }
 
   /**
+   * Read and parse Operating system identifying information.
+   * <p>
+   * This reads and parses entries from the {@code /etc/os-release} and
+   * {@code /proc/version_signature} system files.
+   *
+   * @return a OperatingSystemInfo container
+   * @throws IOException if the required system files cannot be read and parsed.
+   */
+  public OperatingSystemInfo getOperatingSystemInfo() throws IOException {
+    return OperatingSystemInfo.getInstance();
+  }
+
+  /**
    * Get an instance of a CPUInfo descriptor.
    *
    * @return a CPUInfo instance
@@ -89,6 +103,35 @@ public class SystemInspectorGeneral {
    */
   public Collection<FileSystemInfo> getFileSystemInfo() throws Exception {
     return FileSystemInfo.getAllInstances();
+  }
+
+  /**
+   * Scan the system and read statistics for all available interfaces.
+   * <p>
+   * This method parses the file {@code /proc/net/dev} and then builds a
+   * NetworkInterfaceInfo instance for each discovered interface entry.
+   *
+   * @return a collection of NetworkInterfaceInfo configurations
+   * @throws IOException if the file {@code /proc/net/dev} cannot be parsed
+   */
+  public Collection<NetworkInterfaceInfo> getNetworkInterfaceInfo() throws IOException {
+    return NetworkInterfaceInfo.getAllInterfaces();
+  }
+
+  /**
+   * Get a single NetworkInterfaceInfo instance for the indicated interface
+   * name. This reads and parses configuration details from the appropriate
+   * {@code /sys/class/net/{name}/statistics} files.
+   *
+   * @param name the interface name. e.g. "eth0". This corresponds to the
+   *             java.net.NetworkInterface {@code name} parameter (accessed via
+   *             the getName() method.
+   * @return a NetworkInterfaceInfo configuration
+   * @throws IOException if the {@code /sys/class/net/{name}/statistics} files
+   *                     cannot be read.
+   */
+  public NetworkInterfaceInfo getNetworkInterfaceInfo(String name) throws IOException {
+    return NetworkInterfaceInfo.getInstance(name);
   }
 
   /**
@@ -138,19 +181,6 @@ public class SystemInspectorGeneral {
    */
   public Collection<PowerSupplyInfo> getPowerSupplyInfo() throws IOException {
     return PowerSupplyInfo.getAllInstances();
-  }
-
-  /**
-   * Read and parse Operating system identifying information.
-   * <p>
-   * This reads and parses entries from the {@code /etc/os-release} and
-   * {@code /proc/version_signature} system files.
-   *
-   * @return a OperatingSystemInfo container
-   * @throws IOException if the required system files cannot be read and parsed.
-   */
-  public OperatingSystemInfo getOperatingSystemInfo() throws IOException {
-    return OperatingSystemInfo.getInstance();
   }
 
   /**
