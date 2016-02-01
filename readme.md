@@ -20,10 +20,13 @@ Java. Instead SIG collects interface status and statistics to supplement the
 existing information available in java.util.NetworkInterface.
 
 ## Release Info
-v1.0.0 (Jan 2016)
+v1.0.0 (Jan 2016) Initial Release
 SIG collects the following system information:
 * Hardware: CPU, memory, file system, network interface, display, power supply
 * Software: operating system, processes, sockets, users, NTP configuration
+v1.0.1 (Feb 2016) Feature add
+* Collect thermal sensor data
+
 
 ## Alternatives
 If you are looking for a ready multiplatform SI library consider
