@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Key Bridge LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -215,11 +215,11 @@ public class CPUInfo {
   }
 
   /**
-   * Get the System uptime in milliseconds since the last restart.
+   * Get the System uptime in seconds since the last restart.
    * <p>
    * This reads from {@code /proc/uptime}.
    *
-   * @return Number of milliseconds since boot.
+   * @return Number of seconds since boot.
    */
   public Long getSystemUptime() throws IOException {
     /**
@@ -228,7 +228,7 @@ public class CPUInfo {
      * seconds.
      */
     String seconds = SIGUtility.readFileString(Paths.get("/proc/uptime")).split("\\s+")[0];
-    return new Double(Double.valueOf(seconds) * 1000).longValue();
+    return Double.valueOf(seconds).longValue();
   }
 
   /**

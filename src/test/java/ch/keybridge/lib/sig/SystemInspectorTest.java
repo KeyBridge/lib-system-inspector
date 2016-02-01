@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Key Bridge LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,6 +45,7 @@ public class SystemInspectorTest {
 
     CPUInfo cpu = sig.getCPUInfo();
     System.out.println("cpu     : " + cpu);
+    System.out.println("uptime  : " + cpu.getSystemUptime());
     System.out.println("  cpu usage  : " + cpu.getSystemUsage() + "%");
     for (Map.Entry<String, Double> entry : cpu.getSystemUsageDetail().entrySet()) {
       System.out.println("  " + entry.getKey() + " " + entry.getValue() + "%");
