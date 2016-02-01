@@ -285,6 +285,16 @@ public class CPUInfo {
     /**
      * Read /proc/stat
      * <p>
+     * cpu — Measures the number of jiffies (1/100 of a second for x86 systems)
+     * that the system has been in user mode, user mode with low priority
+     * (nice), system mode, idle task, I/O wait, IRQ (hardirq), and softirq
+     * respectively. The IRQ (hardirq) is the direct response to a hardware
+     * event. The IRQ takes minimal work for queuing the "heavy" work up for the
+     * softirq to execute. The softirq runs at a lower priority than the IRQ and
+     * therefore may be interrupted more frequently. The total for all CPUs is
+     * given at the top, while each individual CPU is listed below with its own
+     * statistics.
+     * <p>
      * The very first "cpu" line aggregates the numbers in all of the other
      * "cpuN" lines.
      * <p>
@@ -332,13 +342,42 @@ public class CPUInfo {
       for (String string : SIGUtility.readFileLines(Paths.get("/proc/stat"))) {
         String[] tokens = string.trim().split("\\s+");
         if (tokens[0].equals("cpu")) { // read only the aggregate number.
-          return (Double.valueOf(tokens[1]) + Double.valueOf(tokens[3])) / (Double.valueOf(tokens[1]) + Double.valueOf(tokens[3]) + Double.valueOf(tokens[5]));
+          return (Double.valueOf(tokens[1]) + Double.valueOf(tokens[2]) + Double.valueOf(tokens[3])) / Double.valueOf(tokens[4]);
+//          return (d(tokens[1]) + d(tokens[3])) / (d(tokens[1]) + d(tokens[3]) + d(tokens[5]));
         }
       }
     } catch (IOException ex) {
       Logger.getLogger(CPUInfo.class.getName()).log(Level.SEVERE, null, ex);
     }
     return -1.0;
+  }
+
+  /**
+   * Get a map detailing the usage (percent) of all processors on this system.
+   * <p>
+   * For a multiprocessor / multi-core system the returned map will include
+   * calculated usage for each processor core.
+   *
+   * @return a sorted map containing entries of
+   *         {@code [processor name, processor usage (%)]}
+   */
+  public Map<String, Double> getSystemUsageDetail() {
+    Map<String, Double> systemUsage = new TreeMap<>();
+    try {
+      for (String string : SIGUtility.readFileLines(Paths.get("/proc/stat"))) {
+        String[] tokens = string.trim().split("\\s+");
+        if (tokens[0].startsWith("cpu") && !tokens[0].equals("cpu")) {
+          systemUsage.put(tokens[0], (Double.valueOf(tokens[1]) + Double.valueOf(tokens[2]) + Double.valueOf(tokens[3])) / Double.valueOf(tokens[4]));
+        }
+      }
+    } catch (IOException ex) {
+      Logger.getLogger(CPUInfo.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    return systemUsage;
+  }
+
+  private double d(String s) {
+    return Double.valueOf(s);
   }
 
   /**
