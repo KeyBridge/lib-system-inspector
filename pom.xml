@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>keybridge.lib</groupId>
   <artifactId>lib-system-inspector</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -27,6 +27,7 @@
     broader, multi-platform focus.
 
     v1.0.0 - first completed release, does not contain INET info
+    v1.0.1 - add thermal sensor information
   </description>
 
   <dependencies>

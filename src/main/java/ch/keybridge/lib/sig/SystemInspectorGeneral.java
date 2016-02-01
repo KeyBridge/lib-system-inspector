@@ -18,6 +18,7 @@ package ch.keybridge.lib.sig;
 import ch.keybridge.lib.sig.enumerated.ESystemType;
 import ch.keybridge.lib.sig.hw.*;
 import ch.keybridge.lib.sig.hw.net.NetworkInterfaceInfo;
+import ch.keybridge.lib.sig.hw.sensor.ThermalInfo;
 import ch.keybridge.lib.sig.sw.OperatingSystemInfo;
 import com.sun.jna.Platform;
 import java.io.IOException;
@@ -181,6 +182,19 @@ public class SystemInspectorGeneral {
    */
   public Collection<PowerSupplyInfo> getPowerSupplyInfo() throws IOException {
     return PowerSupplyInfo.getAllInstances();
+  }
+
+  /**
+   * Scan, read and parse all available temperature sensor configurations on the
+   * current system.
+   * <p>
+   * This method reads sensor information from the
+   * {@code /sys/class/hwmon/hwmon[i]/device/temp[i]} kernel run time files.
+   *
+   * @return a collection of ThermalInfo configurations
+   */
+  public Collection<ThermalInfo> getThermalInfo() {
+    return ThermalInfo.getAllInstances();
   }
 
   /**
