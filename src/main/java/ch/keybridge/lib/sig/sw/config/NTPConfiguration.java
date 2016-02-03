@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Key Bridge LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,13 @@
 package ch.keybridge.lib.sig.sw.config;
 
 import ch.keybridge.lib.sig.utility.SIGUtility;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.TimeZone;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Container for Network Time Protocol status on a Linux system.
@@ -41,13 +46,20 @@ public class NTPConfiguration {
    * server.
    */
   private boolean inSync;
+
+  /**
+   * * The local time zone of the system. This is read from the file
+   * {@code /etc/timezone}.
+   */
+  private TimeZone timeZone;
+
   /**
    * A collection of NTP servers.
    */
   private Collection<NTPPeerInfo> peers;
 
   /**
-   * Construct a new LinuxNTPStatus and initialize the peers collection. This
+   * Construct a new NTP Configuration and initialize the peers collection. This
    * executes and reads the response from the system command {@code ntpq -pn}.
    *
    * @throws Exception if the system command {@code ntpq -pn} fails to execute.
@@ -67,6 +79,15 @@ public class NTPConfiguration {
       } catch (Exception e) {
         // ignore parse errors.
       }
+    }
+    /**
+     * Read and set the local time zone.
+     */
+    try {
+      ntpConfig.setTimeZone(TimeZone.getTimeZone(SIGUtility.readFileString(Paths.get("/etc/timezone"))));
+    } catch (IOException iOException) {
+      Logger.getLogger(NTPConfiguration.class.getName()).log(Level.WARNING, "Error reading /etc/timezone. Using system default.");
+      ntpConfig.setTimeZone(TimeZone.getDefault());
     }
     return ntpConfig;
   }
@@ -91,13 +112,21 @@ public class NTPConfiguration {
 
   public Collection<NTPPeerInfo> getPeers() {
     if (peers == null) {
-      peers = new HashSet<>();
+      peers = new TreeSet<>();
     }
     return peers;
   }
 
   public void setPeers(Collection<NTPPeerInfo> peers) {
     this.peers = peers;
+  }
+
+  public TimeZone getTimeZone() {
+    return timeZone;
+  }
+
+  public void setTimeZone(TimeZone timeZone) {
+    this.timeZone = timeZone;
   }//</editor-fold>
 
   @Override
