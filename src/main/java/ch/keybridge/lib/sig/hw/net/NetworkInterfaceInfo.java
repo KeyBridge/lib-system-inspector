@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Key Bridge LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,10 +18,9 @@ package ch.keybridge.lib.sig.hw.net;
 import ch.keybridge.lib.sig.utility.SIGUtility;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -121,6 +120,31 @@ public class NetworkInterfaceInfo {
   private Long multicast;
 
   /**
+   * IPV6 bytes received.
+   */
+  private Long ip6InOctets;
+  /**
+   * IPV6 bytes transmitted.
+   */
+  private Long ip6OutOctets;
+  /**
+   * IPV6 multicast bytes received.
+   */
+  private Long ip6InMcastOctets;
+  /**
+   * IPV6 multicast bytes sent.
+   */
+  private Long ip6OutMcastOctets;
+  /**
+   * IPV6 multicast packets received.
+   */
+  private Long ip6InMcastPkts;
+  /**
+   * IPV6 multicast bytes sent.
+   */
+  private Long ip6OutMcastPkts;
+
+  /**
    * Scan the system and read statistics for all available interfaces.
    * <p>
    * This method parses the file {@code /proc/net/dev} and then builds a
@@ -201,10 +225,34 @@ public class NetworkInterfaceInfo {
     } catch (IOException | NumberFormatException iOException) {
       Logger.getLogger(NetworkInterfaceInfo.class.getName()).log(Level.WARNING, "Error reading statistics for interface {0}", name);
     }
+    /**
+     * Build and populate a Stats container for the indicated IP address. This
+     * method reads and parses the {@code /proc/net/dev_snmp} kernel run time
+     * file.
+     * <p>
+     * Note: Packet and Byte statistics are reported against the physical (i.e.
+     * Ethernet) interface and NOT against the IP address. ONLY IPv6 statistics
+     * are reported at the IP layer.
+     */
+    try {
+      Map<String, Long> x = new HashMap<>();
+      for (String line : Files.readAllLines(Paths.get("/proc/net/dev_snmp6/", name))) {
+        String[] tokens = line.split("\\s+");
+        x.put(tokens[0], Long.valueOf(tokens[1]));
+      }
+      interfaceInfo.setIp6InOctets(x.get("Ip6InOctets"));
+      interfaceInfo.setIp6OutOctets(x.get("Ip6OutOctets"));
+      interfaceInfo.setIp6InMcastOctets(x.get("Ip6InMcastOctets"));
+      interfaceInfo.setIp6OutMcastOctets(x.get("Ip6OutMcastOctets"));
+      interfaceInfo.setIp6InMcastPkts(x.get("Ip6InMcastPkts"));
+      interfaceInfo.setIp6OutMcastPkts(x.get("Ip6OutMcastPkts"));
+    } catch (IOException | NumberFormatException iOException) {
+    }
+
     return interfaceInfo;
   }
-
   //<editor-fold defaultstate="collapsed" desc="Getter and Setter">
+
   public String getName() {
     return name;
   }
@@ -331,6 +379,54 @@ public class NetworkInterfaceInfo {
 
   public void setMulticast(Long multicast) {
     this.multicast = multicast;
+  }
+
+  public Long getIp6InOctets() {
+    return ip6InOctets;
+  }
+
+  public void setIp6InOctets(Long ip6InOctets) {
+    this.ip6InOctets = ip6InOctets;
+  }
+
+  public Long getIp6OutOctets() {
+    return ip6OutOctets;
+  }
+
+  public void setIp6OutOctets(Long ip6OutOctets) {
+    this.ip6OutOctets = ip6OutOctets;
+  }
+
+  public Long getIp6InMcastOctets() {
+    return ip6InMcastOctets;
+  }
+
+  public void setIp6InMcastOctets(Long ip6InMcastOctets) {
+    this.ip6InMcastOctets = ip6InMcastOctets;
+  }
+
+  public Long getIp6OutMcastOctets() {
+    return ip6OutMcastOctets;
+  }
+
+  public void setIp6OutMcastOctets(Long ip6OutMcastOctets) {
+    this.ip6OutMcastOctets = ip6OutMcastOctets;
+  }
+
+  public Long getIp6InMcastPkts() {
+    return ip6InMcastPkts;
+  }
+
+  public void setIp6InMcastPkts(Long ip6InMcastPkts) {
+    this.ip6InMcastPkts = ip6InMcastPkts;
+  }
+
+  public Long getIp6OutMcastPkts() {
+    return ip6OutMcastPkts;
+  }
+
+  public void setIp6OutMcastPkts(Long ip6OutMcastPkts) {
+    this.ip6OutMcastPkts = ip6OutMcastPkts;
   }//</editor-fold>
 
   @Override
