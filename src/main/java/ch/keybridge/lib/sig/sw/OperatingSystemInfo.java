@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Key Bridge LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,6 +39,11 @@ import java.util.Collection;
 public class OperatingSystemInfo {
 
   /**
+   * The operating system family. e.g. "GNU/Linux"
+   */
+  public String family;
+
+  /**
    * The operating system name. This is typically the publisher (i.e. "Ubuntu",
    * "Debian", "Red Hat", etc.)
    */
@@ -48,46 +53,57 @@ public class OperatingSystemInfo {
    */
   public String version;
   /**
-   * The Operating system release ID. This is typically a (terse) version
+   * The Operating system version ID. This is typically a (terse) version
    * number. e.g. "12.04".
    */
-  public String release;
+  public String versionId;
   /**
-   * The kernel version signature. This is read from
-   * {@code /proc/version_signature}. e.g. "Ubuntu 3.2.0-55.85-generic 3.2.51"
+   * The Operating system release. This is typically the compiled kernel
+   * version. e.g. "3.2.0-55-generic".
    */
-  public String kernel;
+  public String release;
+
+  /**
+   * The machine hardware name. e.g. "x86_64"
+   */
+  public String machine;
 
   /**
    * Read and parse Operating system identifying information.
    * <p>
-   * This reads and parses entries from the {@code /etc/os-release} and
-   * {@code /proc/version_signature} system files.
+   * This reads and parses entries from the {@code /etc/os-release} and output
+   * from the {@code uname} system command.
    *
    * @return a OperatingSystemInfo container
-   * @throws IOException if the required system files cannot be read and parsed.
+   * @throws IOException if the {@code /etc/os-release} system file cannot be
+   *                     read and parsed.
+   * @throws Exception   is the {@code uname} system command fails to execute.
    */
-  public static OperatingSystemInfo getInstance() throws IOException {
+  public static OperatingSystemInfo getInstance() throws IOException, Exception {
     OperatingSystemInfo osInfo = new OperatingSystemInfo();
 
     /**
      * Read and parse the configuration file.
      */
     for (String line : SIGUtility.readFileLines(Paths.get("/etc/os-release"))) {
-      if (line.startsWith("NAME")) {
-        osInfo.setName(stripQuotes(line.split("=")[1]));
-      }
-      if (line.startsWith("VERSION")) {
-        osInfo.setVersion(stripQuotes(line.split("=")[1]));
-      }
-      if (line.startsWith("ID=")) {
-        osInfo.setRelease(stripQuotes(line.split("=")[1]));
+      switch (line.split("=")[0]) {
+        case "NAME":
+          osInfo.setName(stripQuotes(line.split("=")[1]));
+          break;
+        case "VERSION":
+          osInfo.setVersion(stripQuotes(line.split("=")[1]));
+          break;
+        case "VERSION_ID":
+          osInfo.setVersionId(stripQuotes(line.split("=")[1]));
+          break;
       }
     }
     /**
-     * Read the kernel version from the /proc/version_signature file.
+     * Parse the kernel and machine information from the {uname} system command.
      */
-    osInfo.setKernel(SIGUtility.readFileString(Paths.get("/proc/version_signature")));
+    osInfo.setFamily(SIGUtility.executeSimple("uname", "-i"));
+    osInfo.setRelease(SIGUtility.executeSimple("uname", "-r"));
+    osInfo.setMachine(SIGUtility.executeSimple("uname", "-m"));
     return osInfo;
   }
 
@@ -102,20 +118,20 @@ public class OperatingSystemInfo {
   }
 
   //<editor-fold defaultstate="collapsed" desc="Getter and Setter">
+  public String getFamily() {
+    return family;
+  }
+
+  public void setFamily(String family) {
+    this.family = family;
+  }
+
   public String getName() {
     return name;
   }
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public String getRelease() {
-    return release;
-  }
-
-  public void setRelease(String release) {
-    this.release = release;
   }
 
   public String getVersion() {
@@ -126,12 +142,28 @@ public class OperatingSystemInfo {
     this.version = version;
   }
 
-  public String getKernel() {
-    return kernel;
+  public String getVersionId() {
+    return versionId;
   }
 
-  public void setKernel(String kernel) {
-    this.kernel = kernel;
+  public void setVersionId(String versionId) {
+    this.versionId = versionId;
+  }
+
+  public String getRelease() {
+    return release;
+  }
+
+  public void setRelease(String release) {
+    this.release = release;
+  }
+
+  public String getMachine() {
+    return machine;
+  }
+
+  public void setMachine(String machine) {
+    this.machine = machine;
   }//</editor-fold>
 
   /**
@@ -144,8 +176,8 @@ public class OperatingSystemInfo {
   }
 
   /**
-   * Read and parseProcEntry socket information from the {@code /proc/net/tcp}
-   * and {@code /proc/net/tcp6} files.
+   * Read and parse socket information from the {@code /proc/net/tcp} and
+   * {@code /proc/net/tcp6} files.
    *
    * @return a TreeSet containing all open sockets.
    * @throws IOException if the {@code /proc/net/tcp} and {@code /proc/net/tcp6}
@@ -178,7 +210,7 @@ public class OperatingSystemInfo {
 
   @Override
   public String toString() {
-    return name != null ? name : kernel;
+    return name != null ? name : release;
   }
 
 }
