@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Key Bridge LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,7 @@ public class SocketInfo {
    */
   private InetAddress localAddress;
   /**
-   * The local socket port. Null for all.
+   * The local socket port. Null for all (i.e. "*").
    */
   private Integer localPort;
   /**
@@ -59,7 +59,7 @@ public class SocketInfo {
    */
   private InetAddress remoteAddress;
   /**
-   * The remote socket port. Null for all.
+   * The remote socket port. Null for all (i.e. "*").
    */
   private Integer remotePort;
   /**
@@ -76,17 +76,20 @@ public class SocketInfo {
   private Integer rxQueue;
 
   /**
-   * Read and parseProcEntry socket information from the {@code /proc/net/tcp}
-   * and {@code /proc/net/tcp6} files.
+   * Read and parse TCP-IPv4 (but not IPv6) socket information from the
+   * {@code netstat} system command.
    *
    * @return a TreeSet containing all open sockets.
-   * @throws IOException if the {@code /proc/net/tcp} and {@code /proc/net/tcp6}
-   *                     files cannot be read.
+   * @throws IOException if the {@code netstat} system command failed to execute
    */
   public static Collection<SocketInfo> getAllSockets() throws Exception {
     Collection<SocketInfo> sockets = new HashSet<>();
     /**
      * Add all IPv4 sockets: TCP and UDP.
+     *
+     * @TODO: If {@code netstat} is not available then fall back to read and
+     * parse socket information from the nd {@code /proc/net/tcp} and
+     * {@code /proc/net/tcp6} run time files.
      */
     for (String entry : SIGUtility.execute("netstat", "-an4")) {// throws Exception
       try {
@@ -224,10 +227,7 @@ public class SocketInfo {
    * @return the port, null if zero.
    */
   private static Integer parsePort(String port) {
-    if ("*".equals(port) || "0".equals(port)) {
-      return null;
-    }
-    return Integer.parseInt(port, 16);
+    return ("*".equals(port) || "0".equals(port)) ? null : Integer.valueOf(port);
   }
 
   @Override
@@ -264,9 +264,17 @@ public class SocketInfo {
     return Objects.equals(this.remotePort, other.remotePort);
   }
 
+  /**
+   * Get a text representation of this socket; shows the protocol, local and
+   * remote address plus port number.
+   *
+   * @return a text representation
+   */
   @Override
   public String toString() {
-    return protocol + ": " + localAddress.getHostAddress() + ":" + localPort + "  " + remoteAddress.getHostAddress() + ":" + remotePort;
+    return protocol
+           + "  " + localAddress.getHostAddress() + ":" + localPort
+           + " - " + remoteAddress.getHostAddress() + ":" + remotePort;
   }
 
   /**
