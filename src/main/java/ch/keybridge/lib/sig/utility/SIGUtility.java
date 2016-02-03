@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Key Bridge LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,6 +50,27 @@ public class SIGUtility {
       }
     }
     return output;
+  }
+
+  /**
+   * Execute a simple command and return the response as a single, concatenated
+   * String. This is intended for simple commands that return a one-line
+   * response, such as {@code date} or {@code uname}, as examples.
+   *
+   * @param command the system command and arguments
+   * @return the system command output
+   * @throws Exception if the command fails to execute.
+   */
+  public static String executeSimple(String... command) throws Exception {
+    Process p = Runtime.getRuntime().exec(command);
+    StringBuilder sb = new StringBuilder();
+    try (BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+      String line;
+      while ((line = input.readLine()) != null) {
+        sb.append(line.trim());
+      }
+    }
+    return sb.toString();
   }
 
   /**
