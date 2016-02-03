@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Key Bridge LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -264,8 +264,21 @@ public class NTPPeerInfo implements Comparable<NTPPeerInfo> {
     return "NTPPeer " + "selectStatus=" + selectStatus + ", remote=" + remote + ", refid=" + refid + ", stratum=" + stratum + ", type=" + type + ", when=" + when + ", poll=" + poll + ", reach=" + reach + ", delay=" + delay + ", offset=" + offset + ", jitter=" + jitter;
   }
 
+  /**
+   * Sort order is by selected status, then stratum depth, then the time last
+   * sync event.
+   *
+   * @param o the other entity
+   * @return the sort order
+   */
   @Override
   public int compareTo(NTPPeerInfo o) {
+    if (selectStatus.equals(o.getSelectStatus())) {
+      if (stratum.equals(o.getStratum())) {
+        return when.compareTo(o.getWhen());
+      }
+      return stratum.compareTo(o.getStratum());
+    }
     return getSelectStatus().compareTo(o.getSelectStatus());
   }
 
