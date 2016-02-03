@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Key Bridge LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -77,8 +77,8 @@ public class SystemUserInfo implements Comparable<SystemUserInfo> {
   private String commandShell;
 
   /**
-   * Read and parseEntry the local {@code /etc/passwd} file into a collection of
-   * LinuxOSUser instances.
+   * Read and parse the local {@code /etc/passwd} configuration file into a
+   * collection of SystemUserInfo configurations.
    *
    * @return a HashSet containing all OS users.
    * @throws IOException if the {@code /etc/passwd} file cannot be read.
@@ -175,6 +175,21 @@ public class SystemUserInfo implements Comparable<SystemUserInfo> {
   public void setCommandShell(String commandShell) {
     this.commandShell = commandShell;
   }//</editor-fold>
+
+  /**
+   * Determine if this user has remote access to the current system.
+   * <p>
+   * This method ONLY inspects for remote SSH access. It inspects the user home
+   * directory, looking for a {@code ~/.ssh/id_rsa} or {@code ~/.ssh/id_dsa}
+   * file.
+   *
+   * @return TRUE if this user has a {@code ~/.ssh/id_rsa} file in their home
+   *         directory.
+   */
+  public Boolean isRemoteAccessCapable() {
+    return Paths.get(homeDirectory, ".ssh", "id_rsa").toFile().exists()
+           || Paths.get(homeDirectory, ".ssh", "id_dsa").toFile().exists();
+  }
 
   @Override
   public int hashCode() {
