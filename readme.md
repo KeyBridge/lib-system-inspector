@@ -26,6 +26,12 @@ SIG collects the following system information:
 * Software: operating system, processes, sockets, users, NTP configuration
 v1.0.1 (Feb 2016) Feature add
 * Collect thermal sensor data
+v1.0.2 (Feb 2016) Feature add, Bug fixes
+* Add IPv6 stats, system timezone, remote access user flag
+* Fix socket number parsing
+* Rewrite OS to support debian flavors
+* System uptime in seconds (not millis)
+* Sorted NTP peers
 
 
 ## Alternatives
