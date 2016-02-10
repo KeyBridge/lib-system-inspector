@@ -53,6 +53,32 @@ public class SIGUtility {
   }
 
   /**
+   * Execute a system command and return the output in a String array.
+   * <p>
+   * This method prepends the input command with the {@code sudo} system
+   * executable.
+   * <p>
+   * Note: This method does NOT accommodate sudoer passwords. To use this method
+   * it is highly recommended that you create a run-time configuration file in
+   * the {@code /etc/sudoers.d} directory granting {@code NOPASSWD} privileges
+   * for the desired command. e.g. for the run-time username "user":
+   * {@code [user] ALL=(root) NOPASSWD: /sbin/iwlist}
+   *
+   * @param command the system command and arguments
+   * @return the system command output
+   * @throws Exception if the command fails to execute.
+   */
+  public static Collection<String> executeSudo(String... command) throws Exception {
+    /**
+     * Prepend the input command with "sudo".
+     */
+    String[] sudoCommand = new String[command.length + 1];
+    sudoCommand[0] = "sudo";
+    System.arraycopy(command, 0, sudoCommand, 1, command.length);
+    return execute(sudoCommand);
+  }
+
+  /**
    * Execute a simple command and return the response as a single, concatenated
    * String. This is intended for simple commands that return a one-line
    * response, such as {@code date} or {@code uname}, as examples.
