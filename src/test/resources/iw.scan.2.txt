@@ -1,0 +1,72 @@
+BSS f8:e4:fb:a0:fe:91 (on wlan0)
+	TSF: 3719126091 usec (0d, 01:01:59)
+	freq: 2437
+	beacon interval: 100
+	capability: ESS Privacy ShortPreamble ShortSlotTime (0x0431)
+	signal: -64.00 dBm
+	last seen: 212 ms ago
+	Information elements from Probe Response frame:
+	SSID: WIFINET
+	Supported rates: 1.0* 2.0* 5.5* 11.0* 6.0 9.0 12.0 18.0
+	DS Parameter set: channel 6
+	Power constraint: 0 dB
+	ERP: <no flags>
+	Extended supported rates: 24.0 36.0 48.0 54.0
+	WMM:	 * Parameter version 1
+		 * BE: CW 15-1023, AIFSN 3
+		 * BK: CW 15-1023, AIFSN 7
+		 * VI: CW 7-15, AIFSN 2, TXOP 3008 usec
+		 * VO: acm CW 3-7, AIFSN 2, TXOP 1504 usec
+	Country: US	Environment: Indoor/Outdoor
+		Channels [1 - 11] @ 27 dBm
+BSS ae:fd:ec:82:98:a4 (on wlan0)
+	TSF: 5056483 usec (0d, 00:00:05)
+	freq: 2412
+	beacon interval: 100
+	capability: ESS Privacy SpectrumMgmt ShortSlotTime (0x0511)
+	signal: -66.00 dBm
+	last seen: 536 ms ago
+	Information elements from Probe Response frame:
+	SSID: WIFINET\xe2\x80\x99s iPhone
+	Supported rates: 1.0* 2.0* 5.5* 11.0* 18.0 24.0 36.0 54.0
+	DS Parameter set: channel 1
+	Power constraint: 0 dB
+	ERP: <no flags>
+	RSN:	 * Version: 1
+		 * Group cipher: CCMP
+		 * Pairwise ciphers: CCMP
+		 * Authentication suites: PSK
+		 * Capabilities: 16-PTKSA-RC (0x000c)
+	Extended supported rates: 6.0 9.0 12.0 48.0
+	HT capabilities:
+		Capabilities: 0x20
+			HT20
+			Static SM Power Save
+			RX HT20 SGI
+			No RX STBC
+			Max AMSDU length: 3839 bytes
+			No DSSS/CCK HT40
+		Maximum RX AMPDU length 32767 bytes (exponent: 0x002)
+		Minimum RX AMPDU time spacing: 8 usec (0x06)
+		HT RX MCS rate indexes supported: 0-7
+		HT TX MCS rate indexes are undefined
+	HT operation:
+		 * primary channel: 1
+		 * secondary channel offset: no secondary
+		 * STA channel width: 20 MHz
+		 * RIFS: 1
+		 * HT protection: no
+		 * non-GF present: 0
+		 * OBSS non-GF present: 0
+		 * dual beacon: 0
+		 * dual CTS protection: 0
+		 * STBC beacon: 0
+		 * L-SIG TXOP Prot: 0
+		 * PCO active: 0
+		 * PCO phase: 0
+	WMM:	 * Parameter version 1
+		 * u-APSD
+		 * BE: CW 15-1023, AIFSN 3
+		 * BK: CW 15-1023, AIFSN 7
+		 * VI: CW 7-15, AIFSN 2, TXOP 3008 usec
+		 * VO: CW 3-7, AIFSN 2, TXOP 1504 usec
