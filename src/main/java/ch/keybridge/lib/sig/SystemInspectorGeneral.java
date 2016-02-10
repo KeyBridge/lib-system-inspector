@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Key Bridge LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ package ch.keybridge.lib.sig;
 import ch.keybridge.lib.sig.enumerated.ESystemType;
 import ch.keybridge.lib.sig.hw.*;
 import ch.keybridge.lib.sig.hw.net.NetworkInterfaceInfo;
+import ch.keybridge.lib.sig.hw.net.WirelessNetworkInfo;
 import ch.keybridge.lib.sig.hw.sensor.ThermalInfo;
 import ch.keybridge.lib.sig.sw.OperatingSystemInfo;
 import com.sun.jna.Platform;
@@ -69,8 +70,9 @@ public class SystemInspectorGeneral {
    *
    * @return a OperatingSystemInfo container
    * @throws IOException if the required system files cannot be read and parsed.
+   * @throws Exception   is the {@code uname} system command fails to execute.
    */
-  public OperatingSystemInfo getOperatingSystemInfo() throws IOException {
+  public OperatingSystemInfo getOperatingSystemInfo() throws IOException, Exception {
     return OperatingSystemInfo.getInstance();
   }
 
@@ -133,6 +135,23 @@ public class SystemInspectorGeneral {
    */
   public NetworkInterfaceInfo getNetworkInterfaceInfo(String name) throws IOException {
     return NetworkInterfaceInfo.getInstance(name);
+  }
+
+  /**
+   * Scan wireless networks on all available wireless ports on the local system.
+   * <p>
+   * This inspects the local system via the {@code /proc/net/dev} system file
+   * and attempts to execute the {@code iw [interface] scan} system command on
+   * each recognized wireless device.
+   *
+   * @return a (alpha-sorted) collection of WirelessNetworkInfo configurations
+   * @throws IOException if the {@code /proc/net/dev} system file cannot be read
+   *                     and parsed
+   * @throws Exception   if the {@code iw [interface] scan} system command fails
+   *                     to execute
+   */
+  public Collection<WirelessNetworkInfo> getWirelessNetworkInfo() throws IOException, Exception {
+    return WirelessNetworkInfo.scanIW();
   }
 
   /**
