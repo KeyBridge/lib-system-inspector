@@ -19,13 +19,20 @@ common system commands such as **ps**, **df** and **netstat**.
 Java. Instead SIG collects interface status and statistics to supplement the
 existing information available in java.util.NetworkInterface.
 
+## Feature Request
+
+Click the **Issues** button above to make a feature request or report a bug.
+
 ## Release Info
 v1.0.0 (Jan 2016) Initial Release
+
 SIG collects the following system information:
 * Hardware: CPU, memory, file system, network interface, display, power supply
 * Software: operating system, processes, sockets, users, NTP configuration
+
 v1.0.1 (Feb 2016) Feature add
 * Collect thermal sensor data
+
 v1.0.2 (Feb 2016) Feature add, Bug fixes
 * Add IPv6 stats, system timezone, remote access user flag
 * Fix socket number parsing
@@ -33,6 +40,8 @@ v1.0.2 (Feb 2016) Feature add, Bug fixes
 * System uptime in seconds (not millis)
 * Sorted NTP peers
 
+v1.0.3 (Feb 2016) Feature add
+* Add wireless network scanning
 
 ## Alternatives
 If you are looking for a ready multiplatform SI library consider

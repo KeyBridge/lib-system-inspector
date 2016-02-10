@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>keybridge.lib</groupId>
   <artifactId>lib-system-inspector</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -29,7 +29,8 @@
     v1.0.0 - first completed release, does not contain INET info
     v1.0.1 - add thermal sensor information
     v1.0.2 - simple executables, IPv6 stats, debian support
-    
+    v1.0.3 - add wireless network scanning
+
   </description>
 
   <dependencies>
