@@ -22,6 +22,7 @@ import ch.keybridge.lib.sig.sw.config.NTPConfiguration;
 import ch.keybridge.lib.sig.sw.config.SystemUserInfo;
 import ch.keybridge.lib.sig.sw.run.ProcessInfo;
 import ch.keybridge.lib.sig.sw.run.SocketInfo;
+import ch.keybridge.lib.sig.utility.SIGUtility;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
@@ -99,8 +100,10 @@ public class SystemInspectorTest {
       System.out.println(" user    : " + user);
     }
 
-    NTPConfiguration ntp = os.getNTPConfiguration();
-    System.out.println("ntp   : " + ntp);
+    if (SIGUtility.canExecute("ntpd")) {
+      NTPConfiguration ntp = os.getNTPConfiguration();
+      System.out.println("ntp   : " + ntp);
+    }
   }
 
 }
