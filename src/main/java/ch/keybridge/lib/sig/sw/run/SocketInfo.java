@@ -45,7 +45,7 @@ public class SocketInfo {
    * Specifies the address family (perhaps better described as low level
    * protocols) for the socket. Typically one of {@code udp, tcp, udp6, tcp6}
    */
-  private EProtocol protocol;
+  private ProtocolType protocol;
   /**
    * The local IP address.
    */
@@ -65,7 +65,7 @@ public class SocketInfo {
   /**
    * The socket connection state.
    */
-  private ESocketState connectionState;
+  private SocketState connectionState;
   /**
    * The transmission queue.
    */
@@ -86,15 +86,19 @@ public class SocketInfo {
     Collection<SocketInfo> sockets = new HashSet<>();
     /**
      * Add all IPv4 sockets: TCP and UDP.
+     * <p>
+     * `ss` is used to dump socket statistics. It allows showing information
+     * similar to netstat. It can display more TCP and state information than
+     * other tools.
      *
-     * @TODO: If {@code netstat} is not available then fall back to read and
-     * parse socket information from the nd {@code /proc/net/tcp} and
+     * @TODO: If {@code ss} is not available then fall back to read and parse
+     * socket information from the nd {@code /proc/net/tcp} and
      * {@code /proc/net/tcp6} run time files.
      */
-    for (String entry : SIGUtility.execute("netstat", "-an4")) {// throws Exception
+    for (String entry : SIGUtility.execute("ss", "-an4")) {// throws Exception
       try {
-        sockets.add(SocketInfo.parseNetstatEntry(entry));
-      } catch (UnknownHostException | NullPointerException | IllegalArgumentException unknownHostException) {
+        sockets.add(SocketInfo.parseSocketEntry(entry));
+      } catch (Exception exception) {
         // ignore parse errors.
       }
     }
@@ -102,47 +106,62 @@ public class SocketInfo {
   }
 
   /**
-   * Parse a row from the output of the {@code netstat} system command into a
-   * new LinuxTCPSocket instance.
+   * Parse a row from the output of the {@code ss} system command into a new
+   * SocketInfo instance.
    *
    * @param entry a entry from the {@code netstat} system command
-   * @return a new LinuxTCPSocket instance
+   * @return a new SocketInfo instance
    */
-  public static SocketInfo parseNetstatEntry(String entry) throws UnknownHostException, NullPointerException, IllegalArgumentException {
+  public static SocketInfo parseSocketEntry(String entry) throws UnknownHostException, NullPointerException, IllegalArgumentException {
     String[] tokens = entry.trim().split("\\s+");
     if (tokens.length != 6 && tokens.length != 5) {
       throw new IllegalArgumentException("Invalid entry: " + entry + ". Length must be 5 or 6; is " + tokens.length);
     }
-
+    /**
+     * `ss` returns a 6 element, space separated column.
+     */
+    // 0 Netid
+    // 1 State
+    // 2 Recv-Q
+    // 3 Send-Q
+    // 4 Local Address:Port
+    // 5 Peer Address:Port
+    // 6 [Process] // often null
+    // Example output  (whitespace removed for readability.
+    //   Netid   State   Recv-Q   Send-Q   Local Address:Port   Peer Address:Port   Process
+    //   udp     UNCONN  0        0        127.0.0.53%lo:53     0.0.0.0:*
+    /**
+     * Instantiate a new instance and assign fields.
+     */
     SocketInfo socket = new SocketInfo();
-    socket.setProtocol(EProtocol.valueOf(tokens[0]));
+    socket.setProtocol(ProtocolType.valueOf(tokens[0])); // netid
+    socket.setConnectionState(SocketState.parse(tokens[1])); // state
+    socket.setRxQueue(Integer.valueOf(tokens[2]));
+    socket.setTxQueue(Integer.valueOf(tokens[3]));
 
-    socket.setLocalAddress(InetAddress.getByName(tokens[3].split(":")[0]));
-    socket.setLocalPort(parsePort(tokens[3].split(":")[1]));
-    socket.setRemoteAddress(InetAddress.getByName(tokens[4].split(":")[0]));
-    socket.setRemotePort(parsePort(tokens[4].split(":")[1]));
-    if (tokens.length == 6) {
-      socket.setConnectionState(ESocketState.valueOf(tokens[5]));
-    }
+    socket.setLocalAddress(InetAddress.getByName(tokens[4].split(":")[0]));
+    socket.setLocalPort(parsePort(tokens[4].split(":")[1]));
+    socket.setRemoteAddress(InetAddress.getByName(tokens[5].split(":")[0]));
+    socket.setRemotePort(parsePort(tokens[5].split(":")[1]));
     /**
      * The rest of this data is informative only and not essential. Ignore any
      * subsequent parsing errors..
      */
-    try {
-      socket.setRxQueue(Integer.valueOf(tokens[1]));
-      socket.setTxQueue(Integer.valueOf(tokens[2]));
-    } catch (Exception exception) {
+    if (tokens.length == 6) {
+      // capture the process
     }
-
+    /**
+     * Done
+     */
     return socket;
   }
 
   //<editor-fold defaultstate="collapsed" desc="Getter and Setter">
-  public EProtocol getProtocol() {
+  public ProtocolType getProtocol() {
     return protocol;
   }
 
-  public void setProtocol(EProtocol protocol) {
+  public void setProtocol(ProtocolType protocol) {
     this.protocol = protocol;
   }
 
@@ -178,11 +197,11 @@ public class SocketInfo {
     this.remotePort = remotePort;
   }
 
-  public ESocketState getConnectionState() {
+  public SocketState getConnectionState() {
     return connectionState;
   }
 
-  public void setConnectionState(ESocketState connectionState) {
+  public void setConnectionState(SocketState connectionState) {
     this.connectionState = connectionState;
   }
 
@@ -273,47 +292,42 @@ public class SocketInfo {
   @Override
   public String toString() {
     return protocol
-           + "  " + localAddress.getHostAddress() + ":" + localPort
-           + " - " + remoteAddress.getHostAddress() + ":" + remotePort;
+      + String.format(" %-16s", connectionState)
+      + String.format(" %16s:%-6s", localAddress.getHostAddress(), (localPort != null ? localPort : "*"))
+      //      + "  " + localAddress.getHostAddress() + (localPort != null ? (":" + localPort) : "")
+      + String.format(" %16s:%-6s", remoteAddress.getHostAddress(), (remotePort != null ? remotePort : "*"));
+//      + " - " + remoteAddress.getHostAddress() + (remotePort != null ? (":" + remotePort) : "");
   }
 
   /**
    * Enumerated TCP/IP socket states. From {@code tcp_states.h} in the linux
    * kernel.
    */
-  public static enum ESocketState {
-    ESTABLISHED("01"),
-    SYN_SENT("02"),
-    SYN_RECV("03"),
-    FIN_WAIT1("04"),
-    FIN_WAIT2("05"),
-    TIME_WAIT("06"),
-    CLOSE("07"),
-    CLOSE_WAIT("08"),
-    LAST_ACK("09"),
-    LISTEN("0A"),
-    CLOSING("0B");
-
-    private final String code;
-
-    private ESocketState(String code) {
-      this.code = code;
-    }
-
-    public String getCode() {
-      return code;
-    }
+  public static enum SocketState {
+    ESTABLISHED,
+    SYN_SENT,
+    SYN_RECV,
+    FIN_WAIT1,
+    FIN_WAIT2,
+    TIME_WAIT,
+    CLOSE,
+    CLOSE_WAIT,
+    LAST_ACK,
+    LISTEN,
+    CLOSING,
+    // UDP
+    UNCONNECTED;
 
     /**
-     * Get a ESocketState instance corresponding to a particular code value.
+     * Get a SocketState instance corresponding to a particular code value.
      *
      * @param code the code
      * @return the instance
      */
-    public static ESocketState fromCode(String code) {
-      for (ESocketState state : ESocketState.values()) {
-        if (state.getCode().equalsIgnoreCase(code)) {
-          return state;
+    public static SocketState parse(String state) {
+      for (SocketState ss : values()) {
+        if (ss.name().startsWith(state)) {
+          return ss;
         }
       }
       return null;
@@ -323,7 +337,7 @@ public class SocketInfo {
   /**
    * Recognized socket protocols reported by the {@code netstat} system command.
    */
-  public static enum EProtocol {
+  public static enum ProtocolType {
     raw, udp, tcp, udp6, tcp6, inet, ipx, ax25, netrom, ddp, unix;
   }
 }
