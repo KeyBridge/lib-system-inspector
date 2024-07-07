@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.keybridge.lib.sig.enumerated;
+package ch.keybridge.lib.sig.type;
 
 import com.sun.jna.Platform;
 
@@ -25,7 +25,7 @@ import com.sun.jna.Platform;
  * @author Key Bridge LLC
  * @since 1.0.0 (01/31/16)
  */
-public enum ESystemType {
+public enum SystemType {
 
   UNSPECIFIED(-1),
   MAC(0),
@@ -46,7 +46,7 @@ public enum ESystemType {
    */
   private final int osType;
 
-  private ESystemType(int osType) {
+  private SystemType(int osType) {
     this.osType = osType;
   }
 
@@ -60,13 +60,13 @@ public enum ESystemType {
   }
 
   /**
-   * Get a ESystemType from a operating system type.
+   * Get a SystemType from a operating system type.
    *
    * @param osType the operating system type
    * @return the enumerated platform type
    */
-  public static ESystemType fromOsType(int osType) {
-    for (ESystemType value : ESystemType.values()) {
+  public static SystemType fromOsType(int osType) {
+    for (SystemType value : SystemType.values()) {
       if (value.getOsType() == osType) {
         return value;
       }
@@ -79,8 +79,8 @@ public enum ESystemType {
    *
    * @return the enumerated platform type
    */
-  public static ESystemType get() {
-    return ESystemType.fromOsType(Platform.getOSType());
+  public static SystemType get() {
+    return SystemType.fromOsType(Platform.getOSType());
   }
 
 }
