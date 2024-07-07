@@ -15,7 +15,7 @@
  */
 package ch.keybridge.lib.sig;
 
-import ch.keybridge.lib.sig.enumerated.ESystemType;
+import ch.keybridge.lib.sig.type.SystemType;
 import ch.keybridge.lib.sig.hw.*;
 import ch.keybridge.lib.sig.hw.net.NetworkInterfaceInfo;
 import ch.keybridge.lib.sig.hw.net.WirelessNetworkInfo;
@@ -36,20 +36,20 @@ public class SystemInspectorGeneral {
   /**
    * The current platform type.
    */
-  private final ESystemType currentPlatform;
+  private final SystemType currentPlatform;
 
   /**
    * Private constructor - use {@link #getInstance()}
    */
   private SystemInspectorGeneral() {
     if (Platform.isWindows()) {
-      this.currentPlatform = ESystemType.WINDOWS;
+      this.currentPlatform = SystemType.WINDOWS;
     } else if (Platform.isLinux()) {
-      this.currentPlatform = ESystemType.LINUX;
+      this.currentPlatform = SystemType.LINUX;
     } else if (Platform.isMac()) {
-      this.currentPlatform = ESystemType.MAC;
+      this.currentPlatform = SystemType.MAC;
     } else {
-      this.currentPlatform = ESystemType.UNSPECIFIED;
+      this.currentPlatform = SystemType.UNSPECIFIED;
     }
   }
 
@@ -221,7 +221,7 @@ public class SystemInspectorGeneral {
    *
    * @return the current platform.
    */
-  public ESystemType getPlatform() {
+  public SystemType getPlatform() {
     return currentPlatform;
   }
 
