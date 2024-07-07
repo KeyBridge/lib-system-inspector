@@ -23,6 +23,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * System Inspector utilities. This class provides shortcuts to execute system
@@ -32,6 +34,29 @@ import java.util.List;
  * @since 1.0.0 (01/31/16) (01/20/16)
  */
 public class SIGUtility {
+
+  /**
+   * Evaluate whether the provided command is installed on the current system
+   * and may be executed.
+   * <p>
+   * Internally this method calls the linux {@code which} command. {@code which}
+   * returns the pathnames of the files (or links) which would be executed in
+   * the current environment, had its arguments been given as commands in a
+   * strictly POSIX-conformant shell. It does this by searching the PATH for
+   * executable files matching the names of the arguments.
+   *
+   * @param command the command to test
+   * @return TRUE if the command is found in the path and may be executed.
+   */
+  public static boolean canExecute(String command) {
+    try {
+      return !execute("which", command).isEmpty();
+    } catch (Exception ex) {
+      Logger.getLogger(SIGUtility.class.getName()).log(Level.SEVERE, null, ex);
+      return false;
+    }
+
+  }
 
   /**
    * Execute a system command and return the output in a String array.
